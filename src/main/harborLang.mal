@@ -16,47 +16,175 @@
 #id: "org.mal-lang.harborLang"
 #version: "1.0.0"
 
-category HarbourVessels {
- 
+// Abstract Base Classes
+category AbstractBase {
 
-  asset GPS {
-    | jammingOnINSChannel
-      -> ins.coordinatesDrifting
+  abstract asset CyberSystem {
+    | compromised
+  }
 
-    | jammingOnAISChannel
-    -> ais.delayedSignalDistribution
+  abstract asset CommunicationSystem extends CyberSystem {
+    | dataManipulation
+  }
 
-    | dataSpoofingOnINSChannel
-      -> ins.coordinatesDrifting
+  abstract asset NavigationSystem extends CyberSystem {
+    | spoofedData
+    | failure  // FIXED: Defined missing attack step
+  }
 
-    | dataSpoofingOnAISChannel
-    ->ais.wrongSignalDistribution
+  abstract asset MaritimeAsset {
+    | operationalDisruption
+    | incorrectFleetRouting  // FIXED: Defined missing attack step
+  }
 }
 
-  asset INS {
+// Cyber Layer (Navigation, Communication, and Traffic Systems)
+category CyberLayer {
+
+  asset GPS extends NavigationSystem {
+    | gpsJamming
+      -> ins.coordinatesDrifting
+    | gpsSpoofing
+      -> vessel.routeDeviation
+    # signalEncryption
+  }
+
+  asset AIS extends CommunicationSystem {
+    | aisSpoofing
+      -> trafficManagement.falseVesselTracking
+    | aisDataManipulation
+      -> vessel.falsePosition
+    # messageAuthentication
+  }
+
+  asset PCS extends CyberSystem {
+    | unauthorizedAccess
+      -> terminalOperations.disruptedCargoProcessing
+    | ransomwareAttack
+      -> portInfrastructure.shutdown  // FIXED: Attack step now exists in `PortInfrastructure`
+    | dataManipulation
+      -> berthPlanning.incorrectScheduling
+  }
+
+  asset FMS extends CyberSystem {
+    | systemHijacking
+      -> routeOptimization.failure  // FIXED: Attack step now exists in `NavigationSystem`
+    | falseDataInjection
+      -> shippingCompany.incorrectFleetRouting  // FIXED: Attack step now exists in `MaritimeAsset`
+  }
+
+  asset TrafficManagement extends CommunicationSystem {
+    | falseVesselTracking
+      -> vessel.routeDeviation
+    | systemHijacking
+      -> operationalDisruption
+    | operationalDisruption
+      -> port.operationalDisruption  
+  }
+}
+
+// Cyber-Physical Layer
+category CyberPhysicalLayer {
+
+  asset INS extends NavigationSystem {
     | coordinatesDrifting
       -> vessel.routeLoss
     | adjustmentToFalseCoordinates
       -> vessel.routeDeviation
+    | correctiveAdjustment
   }
 
-  asset AIS {
-    | delayedSignalDistribution
-    | wrongSignalDistribution
-   
+  asset PortInfrastructure extends MaritimeAsset {
+    | operationalDisruption
+    | delayedPortCommunications
+    | shutdown  // FIXED: Attack step now exists in `PortInfrastructure`
   }
 
-  asset Vessel  {
-    | routeLoss
-    | routeDeviation
+  asset TerminalOperations extends MaritimeAsset {
+    | disruptedCargoProcessing
+      -> cargo.lossOfTracking
+    | unauthorizedSystemAccess
+      -> berthPlanning.delays
+  }
 
+  asset BerthPlanning extends CyberSystem {
+    | incorrectScheduling
+      -> vessel.unexpectedWaitingTime
+    | delays  // FIXED: Defined missing attack step
   }
 }
 
+// Physical Layer
+category PhysicalLayer {
+
+  asset Vessel extends MaritimeAsset {
+    | routeLoss
+    | routeDeviation
+    | collisionRisk
+    | falsePosition
+    | manualCorrection
+    | unexpectedWaitingTime
+    | miscommunication  // FIXED: Defined missing attack step
+  }
+
+  asset HumanOperator extends MaritimeAsset {
+    | detectsCyberThreat
+      -> vessel.manualCorrection
+    | overridesNavigation
+      -> ins.correctiveAdjustment
+  }
+
+  asset Cargo extends MaritimeAsset {
+    | lossOfTracking
+      -> terminalOperations.disruptedCargoProcessing
+  }
+}
+
+// System Failures and Human Factors
+category SystemFailures {
+
+  asset SystemFailure {
+    | hardwareMalfunction
+      -> gps.gpsJamming
+    | softwareBug
+      -> ais.aisDataManipulation
+  }
+
+  asset HumanError {
+    | misinterpretation
+      -> vessel.routeDeviation
+    | delayedResponse
+      -> vessel.collisionRisk
+  }
+}
+
+// Asset Relationships and Interactions (Fixed Unused Association)
 associations {
+  GPS [gps] 1 <-- CommunicatesWith --> 1 [ins] INS
+  GPS [gps] 1 <-- Affects --> 1 [vessel] Vessel
 
- AIS [ais] 1 <-- CommunicatesWith --> 1 [gps] GPS
- GPS  [gps] 1 <--CommunicatesWith--> 1 [ins] INS
- Vessel [vessel] 1  <-- EquipedWith --> * [ins] INS
+  AIS [ais] 1 <-- CommunicatesWith --> 1 [trafficManagement] TrafficManagement
+  AIS [ais] 1 <-- SendsDataTo --> 1 [vessel] Vessel
 
- }
+  PCS [pcs] 1 <-- Manages --> 1 [terminalOperations] TerminalOperations
+  PCS [pcs] 1 <-- Manages --> 1 [berthPlanning] BerthPlanning
+  
+  BerthPlanning [berthPlanning] 1 <-- Schedules --> * [vessel] Vessel
+  TerminalOperations [terminalOperations] 1 <-- Handles --> * [cargo] Cargo
+
+  HumanOperator [operator] 1 <-- Oversees --> * [vessel] Vessel
+  HumanOperator [operator] 1 <-- Manages --> * [ins] INS
+
+ 
+  PortInfrastructure [port] 1 <-- ManagedBy --> 1 [trafficManagement] TrafficManagement
+
+  PCS [pcs] 1 <-- ConnectedTo --> 1 [portInfrastructure] PortInfrastructure
+  FMS [fms] 1 <-- Optimizes --> 1 [routeOptimization] NavigationSystem
+  FMS [fms] 1 <-- BelongsTo --> 1 [shippingCompany] MaritimeAsset
+  TrafficManagement [trafficManagement] 1 <-- Manages --> 1 [vessel] Vessel
+  INS [ins] 1 <-- Guides --> 1 [vessel] Vessel
+  TerminalOperations [terminalOperations] 1 <-- Uses --> 1 [berthPlanning] BerthPlanning
+  SystemFailure [systemFailure] 1 <-- Disrupts --> 1 [gps] GPS
+  SystemFailure [systemFailure] 1 <-- Affects --> 1 [ais] AIS
+  HumanError [humanError] 1 <-- Affects --> 1 [vessel] Vessel
+}
