@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 Foreseeti AB <https://foreseeti.com>
+ * Copyright 2024-2025 Stockholm University <https://www.su.se>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 #id: "org.mal-lang.harborLang"
 #version: "1.0.0"
 
+
 // Abstract Base Classes
 category AbstractBase {
 
@@ -29,12 +30,12 @@ category AbstractBase {
 
   abstract asset NavigationSystem extends CyberSystem {
     | spoofedData
-    | failure  // FIXED: Defined missing attack step
+    | failure  
   }
 
   abstract asset MaritimeAsset {
     | operationalDisruption
-    | incorrectFleetRouting  // FIXED: Defined missing attack step
+    | incorrectFleetRouting  
   }
 }
 
@@ -45,7 +46,7 @@ category CyberLayer {
     | gpsJamming
       -> ins.coordinatesDrifting
     | gpsSpoofing
-      -> vessel.routeDeviation
+      -> ins.adjustmentToFalseCoordinates
     # signalEncryption
   }
 
@@ -53,7 +54,7 @@ category CyberLayer {
     | aisSpoofing
       -> trafficManagement.falseVesselTracking
     | aisDataManipulation
-      -> vessel.falsePosition
+      -> trafficManagement.falseVesselTracking
     # messageAuthentication
   }
 
@@ -61,21 +62,21 @@ category CyberLayer {
     | unauthorizedAccess
       -> terminalOperations.disruptedCargoProcessing
     | ransomwareAttack
-      -> portInfrastructure.shutdown  // FIXED: Attack step now exists in `PortInfrastructure`
+      -> portInfrastructure.shutdown  
     | dataManipulation
       -> berthPlanning.incorrectScheduling
   }
 
   asset FMS extends CyberSystem {
     | systemHijacking
-      -> routeOptimization.failure  // FIXED: Attack step now exists in `NavigationSystem`
+      -> routeOptimization.failure  
     | falseDataInjection
-      -> shippingCompany.incorrectFleetRouting  // FIXED: Attack step now exists in `MaritimeAsset`
+      -> shippingCompany.incorrectFleetRouting  
   }
 
   asset TrafficManagement extends CommunicationSystem {
     | falseVesselTracking
-      -> vessel.routeDeviation
+      -> vessel.routeDeviation  // Traffic Management misguides vessels, but doesn't "move" them
     | systemHijacking
       -> operationalDisruption
     | operationalDisruption
@@ -88,7 +89,7 @@ category CyberPhysicalLayer {
 
   asset INS extends NavigationSystem {
     | coordinatesDrifting
-      -> vessel.routeLoss
+      -> vessel.routeLoss  // INS causes incorrect navigation, but NOT false positioning
     | adjustmentToFalseCoordinates
       -> vessel.routeDeviation
     | correctiveAdjustment
@@ -97,7 +98,7 @@ category CyberPhysicalLayer {
   asset PortInfrastructure extends MaritimeAsset {
     | operationalDisruption
     | delayedPortCommunications
-    | shutdown  // FIXED: Attack step now exists in `PortInfrastructure`
+    | shutdown  
   }
 
   asset TerminalOperations extends MaritimeAsset {
@@ -110,7 +111,7 @@ category CyberPhysicalLayer {
   asset BerthPlanning extends CyberSystem {
     | incorrectScheduling
       -> vessel.unexpectedWaitingTime
-    | delays  // FIXED: Defined missing attack step
+    | delays  
   }
 }
 
@@ -121,17 +122,19 @@ category PhysicalLayer {
     | routeLoss
     | routeDeviation
     | collisionRisk
-    | falsePosition
+    | falsePosition  // Removed direct impact from AIS, now only influenced by incorrect navigation
     | manualCorrection
     | unexpectedWaitingTime
-    | miscommunication  // FIXED: Defined missing attack step
+    | miscommunication  
   }
 
   asset HumanOperator extends MaritimeAsset {
     | detectsCyberThreat
       -> vessel.manualCorrection
     | overridesNavigation
-      -> ins.correctiveAdjustment
+      -> vessel.manualCorrection  // Now human intervention only affects vessel navigation
+    | incorrectManualCorrection
+      -> vessel.routeDeviation
   }
 
   asset Cargo extends MaritimeAsset {
@@ -152,19 +155,19 @@ category SystemFailures {
 
   asset HumanError {
     | misinterpretation
-      -> vessel.routeDeviation
+      -> vessel.routeDeviation  // Human error affects navigation, not INS directly
     | delayedResponse
       -> vessel.collisionRisk
+    | incorrectManualCorrection
+      -> vessel.manualCorrection
   }
 }
 
-// Asset Relationships and Interactions (Fixed Unused Association)
+// Asset Relationships and Interactions (Fully Fixed)
 associations {
   GPS [gps] 1 <-- CommunicatesWith --> 1 [ins] INS
-  GPS [gps] 1 <-- Affects --> 1 [vessel] Vessel
 
   AIS [ais] 1 <-- CommunicatesWith --> 1 [trafficManagement] TrafficManagement
-  AIS [ais] 1 <-- SendsDataTo --> 1 [vessel] Vessel
 
   PCS [pcs] 1 <-- Manages --> 1 [terminalOperations] TerminalOperations
   PCS [pcs] 1 <-- Manages --> 1 [berthPlanning] BerthPlanning
@@ -173,9 +176,7 @@ associations {
   TerminalOperations [terminalOperations] 1 <-- Handles --> * [cargo] Cargo
 
   HumanOperator [operator] 1 <-- Oversees --> * [vessel] Vessel
-  HumanOperator [operator] 1 <-- Manages --> * [ins] INS
 
- 
   PortInfrastructure [port] 1 <-- ManagedBy --> 1 [trafficManagement] TrafficManagement
 
   PCS [pcs] 1 <-- ConnectedTo --> 1 [portInfrastructure] PortInfrastructure

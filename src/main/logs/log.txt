@@ -1,2 +1,2 @@
-03-13 10:31 maltoolbox   INFO     Set loggin level of maltoolbox to 20.
-03-13 10:32 maltoolbox.language.languagegraph INFO     Loading mar archive /Users/dianamalakhova/Downloads/harborLang/src/main/org.mal-lang.harborLang-1.0.0.mar
+03-15 16:17 maltoolbox   INFO     Set loggin level of maltoolbox to 20.
+03-15 16:19 maltoolbox.language.languagegraph INFO     Loading mar archive /Users/dianamalakhova/Downloads/harborLang/src/main/org.mal-lang.harborLang-1.0.0.mar
