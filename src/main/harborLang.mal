@@ -16,7 +16,6 @@
 #id: "org.mal-lang.harborLang"
 #version: "1.0.0"
 
-
 // Abstract Base Classes
 category AbstractBase {
 
@@ -44,9 +43,9 @@ category CyberLayer {
 
   asset GPS extends NavigationSystem {
     | gpsJamming
-      -> ins.coordinatesDrifting
+      -> ins.coordinatesDrifting  // INS drift occurs due to GPS jamming
     | gpsSpoofing
-      -> ins.adjustmentToFalseCoordinates
+      -> ins.adjustmentToFalseCoordinates  
     # signalEncryption
   }
 
@@ -76,7 +75,9 @@ category CyberLayer {
 
   asset TrafficManagement extends CommunicationSystem {
     | falseVesselTracking
-      -> vessel.routeDeviation  // Traffic Management misguides vessels, but doesn't "move" them
+      -> incorrectFleetRouting  // Traffic Management misguides vessels
+    | incorrectFleetRouting
+      -> vessel.routeDeviation
     | systemHijacking
       -> operationalDisruption
     | operationalDisruption
@@ -89,7 +90,7 @@ category CyberPhysicalLayer {
 
   asset INS extends NavigationSystem {
     | coordinatesDrifting
-      -> vessel.routeLoss  // INS causes incorrect navigation, but NOT false positioning
+      -> vessel.routeLoss  // INS drift causes vessel route loss
     | adjustmentToFalseCoordinates
       -> vessel.routeDeviation
     | correctiveAdjustment
@@ -121,8 +122,8 @@ category PhysicalLayer {
   asset Vessel extends MaritimeAsset {
     | routeLoss
     | routeDeviation
-    | collisionRisk
-    | falsePosition  // Removed direct impact from AIS, now only influenced by incorrect navigation
+    | collisionRisk 
+    | falsePosition  
     | manualCorrection
     | unexpectedWaitingTime
     | miscommunication  
@@ -132,9 +133,11 @@ category PhysicalLayer {
     | detectsCyberThreat
       -> vessel.manualCorrection
     | overridesNavigation
-      -> vessel.manualCorrection  // Now human intervention only affects vessel navigation
+      -> vessel.manualCorrection  
     | incorrectManualCorrection
       -> vessel.routeDeviation
+    | misinterpretsAIS
+      -> vessel.routeDeviation  // Operator reacts incorrectly to false AIS data
   }
 
   asset Cargo extends MaritimeAsset {
@@ -148,14 +151,14 @@ category SystemFailures {
 
   asset SystemFailure {
     | hardwareMalfunction
-      -> gps.gpsJamming
+      -> gps.gpsJamming  
     | softwareBug
       -> ais.aisDataManipulation
   }
 
   asset HumanError {
     | misinterpretation
-      -> vessel.routeDeviation  // Human error affects navigation, not INS directly
+      -> vessel.routeDeviation  
     | delayedResponse
       -> vessel.collisionRisk
     | incorrectManualCorrection
@@ -182,7 +185,7 @@ associations {
   PCS [pcs] 1 <-- ConnectedTo --> 1 [portInfrastructure] PortInfrastructure
   FMS [fms] 1 <-- Optimizes --> 1 [routeOptimization] NavigationSystem
   FMS [fms] 1 <-- BelongsTo --> 1 [shippingCompany] MaritimeAsset
-  TrafficManagement [trafficManagement] 1 <-- Manages --> 1 [vessel] Vessel
+  TrafficManagement [trafficManagement] 1 <-- Manages --> 1 [vessel] Vessel  
   INS [ins] 1 <-- Guides --> 1 [vessel] Vessel
   TerminalOperations [terminalOperations] 1 <-- Uses --> 1 [berthPlanning] BerthPlanning
   SystemFailure [systemFailure] 1 <-- Disrupts --> 1 [gps] GPS
