@@ -1,0 +1,544 @@
+attack_steps:
+  AIS:2:aisDataManipulation:
+    asset: AIS:2
+    children:
+      9: AIS:2:falseAISDataToVessel
+    compromised_by:
+    - Attacker:0
+    id: 7
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: AIS:aisDataManipulation
+    name: aisDataManipulation
+    parents: {}
+    ttc: null
+    type: or
+  AIS:2:aisSpoofing:
+    asset: AIS:2
+    children:
+      8: AIS:2:falseAISDataToTrafficManagement
+      9: AIS:2:falseAISDataToVessel
+    compromised_by: []
+    id: 6
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: AIS:aisSpoofing
+    name: aisSpoofing
+    parents: {}
+    ttc: null
+    type: or
+  AIS:2:compromised:
+    asset: AIS:2
+    children: {}
+    compromised_by: []
+    id: 12
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: AIS:compromised
+    name: compromised
+    parents: {}
+    ttc: null
+    type: or
+  AIS:2:dataManipulation:
+    asset: AIS:2
+    children: {}
+    compromised_by: []
+    id: 11
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: AIS:dataManipulation
+    name: dataManipulation
+    parents: {}
+    ttc: null
+    type: or
+  AIS:2:falseAISData:
+    asset: AIS:2
+    children:
+      28: Vessel:6:falsePosition
+    compromised_by: []
+    id: 10
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: AIS:falseAISData
+    name: falseAISData
+    parents: {}
+    ttc: null
+    type: or
+  AIS:2:falseAISDataToTrafficManagement:
+    asset: AIS:2
+    children:
+      13: TrafficManagement:3:falseVesselTracking
+      14: TrafficManagement:3:incorrectFleetRouting
+    compromised_by: []
+    id: 8
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: AIS:falseAISDataToTrafficManagement
+    name: falseAISDataToTrafficManagement
+    parents:
+      6: AIS:2:aisSpoofing
+    ttc: null
+    type: or
+  AIS:2:falseAISDataToVessel:
+    asset: AIS:2
+    children:
+      27: Vessel:6:collisionRisk
+      29: Vessel:6:receivedFalseAIS
+    compromised_by: []
+    id: 9
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: AIS:falseAISDataToVessel
+    name: falseAISDataToVessel
+    parents:
+      6: AIS:2:aisSpoofing
+      7: AIS:2:aisDataManipulation
+    ttc: null
+    type: or
+  GPS:1:compromised:
+    asset: GPS:1
+    children: {}
+    compromised_by: []
+    id: 5
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: GPS:compromised
+    name: compromised
+    parents: {}
+    ttc: null
+    type: or
+  GPS:1:failure:
+    asset: GPS:1
+    children: {}
+    compromised_by: []
+    id: 4
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: GPS:failure
+    name: failure
+    parents: {}
+    ttc: null
+    type: or
+  GPS:1:gpsJamming:
+    asset: GPS:1
+    children:
+      20: INS:5:coordinatesDrifting
+    compromised_by:
+    - Attacker:0
+    id: 0
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: GPS:gpsJamming
+    name: gpsJamming
+    parents: {}
+    ttc: null
+    type: or
+  GPS:1:gpsSpoofing:
+    asset: GPS:1
+    children:
+      21: INS:5:adjustmentToFalseCoordinates
+    compromised_by: []
+    id: 1
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: GPS:gpsSpoofing
+    name: gpsSpoofing
+    parents: {}
+    ttc: null
+    type: or
+  GPS:1:signalEncryption:
+    asset: GPS:1
+    children: {}
+    compromised_by: []
+    defense_status: '0.0'
+    id: 2
+    is_necessary: 'False'
+    is_viable: 'True'
+    lang_graph_attack_step: GPS:signalEncryption
+    name: signalEncryption
+    parents: {}
+    ttc: null
+    type: defense
+  GPS:1:spoofedData:
+    asset: GPS:1
+    children: {}
+    compromised_by: []
+    id: 3
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: GPS:spoofedData
+    name: spoofedData
+    parents: {}
+    ttc: null
+    type: or
+  HumanOperator:7:detectsCyberThreat:
+    asset: HumanOperator:7
+    children:
+      30: Vessel:6:manualCorrection
+    compromised_by: []
+    id: 34
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: HumanOperator:detectsCyberThreat
+    name: detectsCyberThreat
+    parents: {}
+    ttc: null
+    type: or
+  HumanOperator:7:incorrectFleetRouting:
+    asset: HumanOperator:7
+    children: {}
+    compromised_by: []
+    id: 39
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: HumanOperator:incorrectFleetRouting
+    name: incorrectFleetRouting
+    parents: {}
+    ttc: null
+    type: or
+  HumanOperator:7:incorrectManualCorrection:
+    asset: HumanOperator:7
+    children:
+      26: Vessel:6:routeDeviation
+    compromised_by: []
+    id: 36
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: HumanOperator:incorrectManualCorrection
+    name: incorrectManualCorrection
+    parents: {}
+    ttc: null
+    type: or
+  HumanOperator:7:misinterpretsAIS:
+    asset: HumanOperator:7
+    children:
+      26: Vessel:6:routeDeviation
+    compromised_by: []
+    id: 37
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: HumanOperator:misinterpretsAIS
+    name: misinterpretsAIS
+    parents: {}
+    ttc: null
+    type: or
+  HumanOperator:7:operationalDisruption:
+    asset: HumanOperator:7
+    children: {}
+    compromised_by: []
+    id: 38
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: HumanOperator:operationalDisruption
+    name: operationalDisruption
+    parents: {}
+    ttc: null
+    type: or
+  HumanOperator:7:overridesNavigation:
+    asset: HumanOperator:7
+    children:
+      30: Vessel:6:manualCorrection
+    compromised_by: []
+    id: 35
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: HumanOperator:overridesNavigation
+    name: overridesNavigation
+    parents: {}
+    ttc: null
+    type: or
+  INS:5:adjustmentToFalseCoordinates:
+    asset: INS:5
+    children:
+      26: Vessel:6:routeDeviation
+    compromised_by: []
+    id: 21
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: INS:adjustmentToFalseCoordinates
+    name: adjustmentToFalseCoordinates
+    parents:
+      1: GPS:1:gpsSpoofing
+    ttc: null
+    type: or
+  INS:5:compromised:
+    asset: INS:5
+    children: {}
+    compromised_by: []
+    id: 24
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: INS:compromised
+    name: compromised
+    parents: {}
+    ttc: null
+    type: or
+  INS:5:coordinatesDrifting:
+    asset: INS:5
+    children:
+      25: Vessel:6:routeLoss
+    compromised_by: []
+    id: 20
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: INS:coordinatesDrifting
+    name: coordinatesDrifting
+    parents:
+      0: GPS:1:gpsJamming
+    ttc: null
+    type: or
+  INS:5:failure:
+    asset: INS:5
+    children: {}
+    compromised_by: []
+    id: 23
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: INS:failure
+    name: failure
+    parents: {}
+    ttc: null
+    type: or
+  INS:5:spoofedData:
+    asset: INS:5
+    children: {}
+    compromised_by: []
+    id: 22
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: INS:spoofedData
+    name: spoofedData
+    parents: {}
+    ttc: null
+    type: or
+  PortInfrastructure:4:incorrectFleetRouting:
+    asset: PortInfrastructure:4
+    children: {}
+    compromised_by: []
+    id: 19
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: PortInfrastructure:incorrectFleetRouting
+    name: incorrectFleetRouting
+    parents: {}
+    ttc: null
+    type: or
+  PortInfrastructure:4:operationalDisruption:
+    asset: PortInfrastructure:4
+    children: {}
+    compromised_by: []
+    id: 18
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: PortInfrastructure:operationalDisruption
+    name: operationalDisruption
+    parents:
+      15: TrafficManagement:3:operationalDisruption
+    ttc: null
+    type: or
+  TrafficManagement:3:compromised:
+    asset: TrafficManagement:3
+    children: {}
+    compromised_by: []
+    id: 17
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: TrafficManagement:compromised
+    name: compromised
+    parents: {}
+    ttc: null
+    type: or
+  TrafficManagement:3:dataManipulation:
+    asset: TrafficManagement:3
+    children: {}
+    compromised_by: []
+    id: 16
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: TrafficManagement:dataManipulation
+    name: dataManipulation
+    parents: {}
+    ttc: null
+    type: or
+  TrafficManagement:3:falseVesselTracking:
+    asset: TrafficManagement:3
+    children:
+      14: TrafficManagement:3:incorrectFleetRouting
+    compromised_by: []
+    id: 13
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: TrafficManagement:falseVesselTracking
+    name: falseVesselTracking
+    parents:
+      8: AIS:2:falseAISDataToTrafficManagement
+    ttc: null
+    type: or
+  TrafficManagement:3:incorrectFleetRouting:
+    asset: TrafficManagement:3
+    children: {}
+    compromised_by: []
+    id: 14
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: TrafficManagement:incorrectFleetRouting
+    name: incorrectFleetRouting
+    parents:
+      8: AIS:2:falseAISDataToTrafficManagement
+      13: TrafficManagement:3:falseVesselTracking
+    ttc: null
+    type: or
+  TrafficManagement:3:operationalDisruption:
+    asset: TrafficManagement:3
+    children:
+      18: PortInfrastructure:4:operationalDisruption
+    compromised_by: []
+    id: 15
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: TrafficManagement:operationalDisruption
+    name: operationalDisruption
+    parents: {}
+    ttc: null
+    type: or
+  Vessel:6:collisionRisk:
+    asset: Vessel:6
+    children:
+      30: Vessel:6:manualCorrection
+    compromised_by: []
+    id: 27
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:collisionRisk
+    name: collisionRisk
+    parents:
+      9: AIS:2:falseAISDataToVessel
+      26: Vessel:6:routeDeviation
+      28: Vessel:6:falsePosition
+      29: Vessel:6:receivedFalseAIS
+    ttc: null
+    type: or
+  Vessel:6:falsePosition:
+    asset: Vessel:6
+    children:
+      27: Vessel:6:collisionRisk
+      32: Vessel:6:operationalDisruption
+    compromised_by: []
+    id: 28
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:falsePosition
+    name: falsePosition
+    parents:
+      10: AIS:2:falseAISData
+      29: Vessel:6:receivedFalseAIS
+    ttc: null
+    type: or
+  Vessel:6:incorrectFleetRouting:
+    asset: Vessel:6
+    children: {}
+    compromised_by: []
+    id: 33
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:incorrectFleetRouting
+    name: incorrectFleetRouting
+    parents: {}
+    ttc: null
+    type: or
+  Vessel:6:manualCorrection:
+    asset: Vessel:6
+    children:
+      26: Vessel:6:routeDeviation
+    compromised_by: []
+    id: 30
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:manualCorrection
+    name: manualCorrection
+    parents:
+      27: Vessel:6:collisionRisk
+      34: HumanOperator:7:detectsCyberThreat
+      35: HumanOperator:7:overridesNavigation
+    ttc: null
+    type: or
+  Vessel:6:operationalDisruption:
+    asset: Vessel:6
+    children: {}
+    compromised_by: []
+    id: 32
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:operationalDisruption
+    name: operationalDisruption
+    parents:
+      28: Vessel:6:falsePosition
+    ttc: null
+    type: or
+  Vessel:6:receivedFalseAIS:
+    asset: Vessel:6
+    children:
+      27: Vessel:6:collisionRisk
+      28: Vessel:6:falsePosition
+    compromised_by: []
+    id: 29
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:receivedFalseAIS
+    name: receivedFalseAIS
+    parents:
+      9: AIS:2:falseAISDataToVessel
+    ttc: null
+    type: or
+  Vessel:6:routeDeviation:
+    asset: Vessel:6
+    children:
+      27: Vessel:6:collisionRisk
+    compromised_by: []
+    id: 26
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:routeDeviation
+    name: routeDeviation
+    parents:
+      21: INS:5:adjustmentToFalseCoordinates
+      30: Vessel:6:manualCorrection
+      36: HumanOperator:7:incorrectManualCorrection
+      37: HumanOperator:7:misinterpretsAIS
+    ttc: null
+    type: or
+  Vessel:6:routeLoss:
+    asset: Vessel:6
+    children: {}
+    compromised_by: []
+    id: 25
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:routeLoss
+    name: routeLoss
+    parents:
+      20: INS:5:coordinatesDrifting
+    ttc: null
+    type: or
+  Vessel:6:unexpectedWaitingTime:
+    asset: Vessel:6
+    children: {}
+    compromised_by: []
+    id: 31
+    is_necessary: 'True'
+    is_viable: 'True'
+    lang_graph_attack_step: Vessel:unexpectedWaitingTime
+    name: unexpectedWaitingTime
+    parents: {}
+    ttc: null
+    type: or
+attackers:
+  Attacker:0:
+    entry_points:
+      0: GPS:1:gpsJamming
+      7: AIS:2:aisDataManipulation
+    id: 0
+    name: Attacker:0
+    reached_attack_steps:
+      0: GPS:1:gpsJamming
+      7: AIS:2:aisDataManipulation

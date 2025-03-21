@@ -42,46 +42,23 @@ category AbstractBase {
 category CyberLayer {
 
   asset GPS extends NavigationSystem {
-    | gpsJamming
-      -> ins.coordinatesDrifting  // INS drift occurs due to GPS jamming
-    | gpsSpoofing
-      -> ins.adjustmentToFalseCoordinates  
+    | gpsJamming -> ins.coordinatesDrifting
+    | gpsSpoofing -> ins.adjustmentToFalseCoordinates
     # signalEncryption
   }
 
   asset AIS extends CommunicationSystem {
-    | aisSpoofing
-      -> trafficManagement.falseVesselTracking
-    | aisDataManipulation
-      -> trafficManagement.falseVesselTracking
-    # messageAuthentication
-  }
-
-  asset PCS extends CyberSystem {
-    | unauthorizedAccess
-      -> terminalOperations.disruptedCargoProcessing
-    | ransomwareAttack
-      -> portInfrastructure.shutdown  
-    | dataManipulation
-      -> berthPlanning.incorrectScheduling
-  }
-
-  asset FMS extends CyberSystem {
-    | systemHijacking
-      -> routeOptimization.failure  
-    | falseDataInjection
-      -> shippingCompany.incorrectFleetRouting  
+    | aisSpoofing -> falseAISDataToTrafficManagement, falseAISDataToVessel
+    | aisDataManipulation -> falseAISDataToVessel
+    | falseAISDataToTrafficManagement -> trafficManagement.falseVesselTracking, trafficManagement.incorrectFleetRouting
+    | falseAISDataToVessel -> vessel.receivedFalseAIS, vessel.collisionRisk
+    | falseAISData -> vessel.falsePosition
   }
 
   asset TrafficManagement extends CommunicationSystem {
-    | falseVesselTracking
-      -> incorrectFleetRouting  // Traffic Management misguides vessels
-    | incorrectFleetRouting
-      -> vessel.routeDeviation
-    | systemHijacking
-      -> operationalDisruption
-    | operationalDisruption
-      -> port.operationalDisruption  
+    | falseVesselTracking -> incorrectFleetRouting
+    | incorrectFleetRouting -> vessel.routeDeviation
+    | operationalDisruption -> portInfrastructure.operationalDisruption
   }
 }
 
@@ -89,30 +66,12 @@ category CyberLayer {
 category CyberPhysicalLayer {
 
   asset INS extends NavigationSystem {
-    | coordinatesDrifting
-      -> vessel.routeLoss  // INS drift causes vessel route loss
-    | adjustmentToFalseCoordinates
-      -> vessel.routeDeviation
-    | correctiveAdjustment
+    | coordinatesDrifting -> vessel.routeLoss  
+    | adjustmentToFalseCoordinates -> vessel.routeDeviation
   }
 
   asset PortInfrastructure extends MaritimeAsset {
     | operationalDisruption
-    | delayedPortCommunications
-    | shutdown  
-  }
-
-  asset TerminalOperations extends MaritimeAsset {
-    | disruptedCargoProcessing
-      -> cargo.lossOfTracking
-    | unauthorizedSystemAccess
-      -> berthPlanning.delays
-  }
-
-  asset BerthPlanning extends CyberSystem {
-    | incorrectScheduling
-      -> vessel.unexpectedWaitingTime
-    | delays  
   }
 }
 
@@ -121,28 +80,19 @@ category PhysicalLayer {
 
   asset Vessel extends MaritimeAsset {
     | routeLoss
-    | routeDeviation
-    | collisionRisk 
-    | falsePosition  
-    | manualCorrection
+    | routeDeviation -> collisionRisk
+    | collisionRisk -> manualCorrection
+    | falsePosition -> collisionRisk, operationalDisruption 
+    | receivedFalseAIS -> falsePosition, collisionRisk 
+    | manualCorrection -> routeDeviation  
     | unexpectedWaitingTime
-    | miscommunication  
   }
 
   asset HumanOperator extends MaritimeAsset {
-    | detectsCyberThreat
-      -> vessel.manualCorrection
-    | overridesNavigation
-      -> vessel.manualCorrection  
-    | incorrectManualCorrection
-      -> vessel.routeDeviation
-    | misinterpretsAIS
-      -> vessel.routeDeviation  // Operator reacts incorrectly to false AIS data
-  }
-
-  asset Cargo extends MaritimeAsset {
-    | lossOfTracking
-      -> terminalOperations.disruptedCargoProcessing
+    | detectsCyberThreat -> vessel.manualCorrection
+    | overridesNavigation -> vessel.manualCorrection  
+    | incorrectManualCorrection -> vessel.routeDeviation
+    | misinterpretsAIS -> vessel.routeDeviation
   }
 }
 
@@ -150,45 +100,27 @@ category PhysicalLayer {
 category SystemFailures {
 
   asset SystemFailure {
-    | hardwareMalfunction
-      -> gps.gpsJamming  
-    | softwareBug
-      -> ais.aisDataManipulation
+    | hardwareMalfunction -> gps.gpsJamming
+    | softwareBug -> ais.aisDataManipulation
   }
 
   asset HumanError {
-    | misinterpretation
-      -> vessel.routeDeviation  
-    | delayedResponse
-      -> vessel.collisionRisk
-    | incorrectManualCorrection
-      -> vessel.manualCorrection
+    | misinterpretation -> vessel.routeDeviation
+    | delayedResponse -> vessel.collisionRisk
+    | incorrectManualCorrection -> vessel.manualCorrection
   }
 }
 
-// Asset Relationships and Interactions (Fully Fixed)
+// Associations (Asset Relationships)
 associations {
   GPS [gps] 1 <-- CommunicatesWith --> 1 [ins] INS
-
-  AIS [ais] 1 <-- CommunicatesWith --> 1 [trafficManagement] TrafficManagement
-
-  PCS [pcs] 1 <-- Manages --> 1 [terminalOperations] TerminalOperations
-  PCS [pcs] 1 <-- Manages --> 1 [berthPlanning] BerthPlanning
-  
-  BerthPlanning [berthPlanning] 1 <-- Schedules --> * [vessel] Vessel
-  TerminalOperations [terminalOperations] 1 <-- Handles --> * [cargo] Cargo
-
-  HumanOperator [operator] 1 <-- Oversees --> * [vessel] Vessel
-
-  PortInfrastructure [port] 1 <-- ManagedBy --> 1 [trafficManagement] TrafficManagement
-
-  PCS [pcs] 1 <-- ConnectedTo --> 1 [portInfrastructure] PortInfrastructure
-  FMS [fms] 1 <-- Optimizes --> 1 [routeOptimization] NavigationSystem
-  FMS [fms] 1 <-- BelongsTo --> 1 [shippingCompany] MaritimeAsset
+  AIS [ais] 1 <-- SendsDataTo --> 1 [vessel] Vessel  
+  AIS [ais] 1 <-- CommunicatesWith --> 1 [trafficManagement] TrafficManagement  
   TrafficManagement [trafficManagement] 1 <-- Manages --> 1 [vessel] Vessel  
-  INS [ins] 1 <-- Guides --> 1 [vessel] Vessel
-  TerminalOperations [terminalOperations] 1 <-- Uses --> 1 [berthPlanning] BerthPlanning
-  SystemFailure [systemFailure] 1 <-- Disrupts --> 1 [gps] GPS
-  SystemFailure [systemFailure] 1 <-- Affects --> 1 [ais] AIS
-  HumanError [humanError] 1 <-- Affects --> 1 [vessel] Vessel
+  TrafficManagement [trafficManagement] 1 <-- ManagedBy --> 1 [portInfrastructure] PortInfrastructure  
+  INS [ins] 1 <-- Guides --> 1 [vessel] Vessel  
+  HumanOperator [humanOperator] 1 <-- Oversees --> 1 [vessel] Vessel  
+  SystemFailure [systemFailure] 1 <-- Disrupts --> 1 [gps] GPS  
+  SystemFailure [systemFailure] 1 <-- Affects --> 1 [ais] AIS  
+  HumanError [humanError] 1 <-- Causes --> 1 [vessel] Vessel  
 }

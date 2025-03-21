@@ -1,0 +1,100 @@
+assets:
+  1:
+    associated_assets:
+      ins:
+        5: INS:5
+    extras:
+      position:
+        x: -403.0
+        y: 104.0
+    name: GPS:1
+    type: GPS
+  2:
+    associated_assets:
+      trafficManagement:
+        3: TrafficManagement:3
+      vessel:
+        6: Vessel:6
+    extras:
+      position:
+        x: -358.0
+        y: -147.0
+    name: AIS:2
+    type: AIS
+  3:
+    associated_assets:
+      ais:
+        2: AIS:2
+      portInfrastructure:
+        4: PortInfrastructure:4
+    extras:
+      position:
+        x: -355.0
+        y: -262.0
+    name: TrafficManagement:3
+    type: TrafficManagement
+  4:
+    associated_assets:
+      trafficManagement:
+        3: TrafficManagement:3
+    extras:
+      position:
+        x: -358.0
+        y: -365.0
+    name: PortInfrastructure:4
+    type: PortInfrastructure
+  5:
+    associated_assets:
+      gps:
+        1: GPS:1
+      vessel:
+        6: Vessel:6
+    extras:
+      position:
+        x: -108.00000000000003
+        y: 250.00000000000006
+    name: INS:5
+    type: INS
+  6:
+    associated_assets:
+      ais:
+        2: AIS:2
+      humanOperator:
+        7: HumanOperator:7
+      ins:
+        5: INS:5
+    extras:
+      position:
+        x: 168.00000000000003
+        y: 58.000000000000014
+    name: Vessel:6
+    type: Vessel
+  7:
+    associated_assets:
+      vessel:
+        6: Vessel:6
+    extras:
+      position:
+        x: 498.0000000000001
+        y: 50.000000000000014
+    name: HumanOperator:7
+    type: HumanOperator
+attackers:
+  0:
+    entry_points:
+      AIS:2:
+        asset_id: 2
+        attack_steps:
+        - aisDataManipulation
+      GPS:1:
+        asset_id: 1
+        attack_steps:
+        - gpsJamming
+    name: Attacker:0
+metadata:
+  MAL-Toolbox Version: 0.3.9
+  info: Created by the mal-toolbox model python module.
+  langID: org.mal-lang.harborLang
+  langVersion: 1.0.0
+  malVersion: 0.1.0-SNAPSHOT
+  name: testcase

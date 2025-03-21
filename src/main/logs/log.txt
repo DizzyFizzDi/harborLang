@@ -1,2 +1,3 @@
-03-15 16:17 maltoolbox   INFO     Set loggin level of maltoolbox to 20.
-03-15 16:19 maltoolbox.language.languagegraph INFO     Loading mar archive /Users/dianamalakhova/Downloads/harborLang/src/main/org.mal-lang.harborLang-1.0.0.mar
+03-19 11:35 maltoolbox   INFO     Set loggin level of maltoolbox to INFO.
+03-19 11:35 maltoolbox.language.languagegraph INFO     Loading mar archive org.mal-lang.harborLang-1.0.0.mar
+03-19 11:35 maltoolbox.attackgraph.attackgraph INFO     Attach attackers from "testcase" model to the graph.

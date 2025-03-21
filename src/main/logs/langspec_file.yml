@@ -1,0 +1,1269 @@
+AIS:
+  associations:
+    systemFailure:
+      info: {}
+      left:
+        asset: SystemFailure
+        fieldname: systemFailure
+        max: 1
+        min: 1
+      name: Affects
+      right:
+        asset: AIS
+        fieldname: ais
+        max: 1
+        min: 1
+    trafficManagement:
+      info: {}
+      left:
+        asset: AIS
+        fieldname: ais
+        max: 1
+        min: 1
+      name: CommunicatesWith
+      right:
+        asset: TrafficManagement
+        fieldname: trafficManagement
+        max: 1
+        min: 1
+    vessel:
+      info: {}
+      left:
+        asset: AIS
+        fieldname: ais
+        max: 1
+        min: 1
+      name: SendsDataTo
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+  attack_steps:
+    aisDataManipulation:
+      asset: AIS
+      children:
+        AIS:falseAISDataToVessel:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: aisDataManipulation
+      overrides: true
+      parents:
+        SystemFailure:softwareBug:
+        - Affects:
+            asset type: SystemFailure
+            fieldname: systemFailure
+          type: field
+      tags: []
+      ttc: null
+      type: or
+    aisSpoofing:
+      asset: AIS
+      children:
+        AIS:falseAISDataToTrafficManagement:
+        - null
+        AIS:falseAISDataToVessel:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: aisSpoofing
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    compromised:
+      asset: AIS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: CommunicationSystem:compromised
+      name: compromised
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    dataManipulation:
+      asset: AIS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: CommunicationSystem:dataManipulation
+      name: dataManipulation
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    falseAISData:
+      asset: AIS
+      children:
+        Vessel:falsePosition:
+        - SendsDataTo:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: falseAISData
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    falseAISDataToTrafficManagement:
+      asset: AIS
+      children:
+        TrafficManagement:falseVesselTracking:
+        - CommunicatesWith:
+            asset type: TrafficManagement
+            fieldname: trafficManagement
+          type: field
+        TrafficManagement:incorrectFleetRouting:
+        - CommunicatesWith:
+            asset type: TrafficManagement
+            fieldname: trafficManagement
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: falseAISDataToTrafficManagement
+      overrides: true
+      parents:
+        AIS:aisSpoofing:
+        - null
+      tags: []
+      ttc: null
+      type: or
+    falseAISDataToVessel:
+      asset: AIS
+      children:
+        Vessel:collisionRisk:
+        - SendsDataTo:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+        Vessel:receivedFalseAIS:
+        - SendsDataTo:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: falseAISDataToVessel
+      overrides: true
+      parents:
+        AIS:aisDataManipulation:
+        - null
+        AIS:aisSpoofing:
+        - null
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: AIS
+  sub_assets: []
+  super_asset: CommunicationSystem
+  variables: {}
+CommunicationSystem:
+  associations: {}
+  attack_steps:
+    compromised:
+      asset: CommunicationSystem
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: CyberSystem:compromised
+      name: compromised
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    dataManipulation:
+      asset: CommunicationSystem
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: dataManipulation
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: true
+  name: CommunicationSystem
+  sub_assets:
+  - AIS
+  - TrafficManagement
+  super_asset: CyberSystem
+  variables: {}
+CyberSystem:
+  associations: {}
+  attack_steps:
+    compromised:
+      asset: CyberSystem
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: compromised
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: true
+  name: CyberSystem
+  sub_assets:
+  - CommunicationSystem
+  - NavigationSystem
+  super_asset: ''
+  variables: {}
+GPS:
+  associations:
+    ins:
+      info: {}
+      left:
+        asset: GPS
+        fieldname: gps
+        max: 1
+        min: 1
+      name: CommunicatesWith
+      right:
+        asset: INS
+        fieldname: ins
+        max: 1
+        min: 1
+    systemFailure:
+      info: {}
+      left:
+        asset: SystemFailure
+        fieldname: systemFailure
+        max: 1
+        min: 1
+      name: Disrupts
+      right:
+        asset: GPS
+        fieldname: gps
+        max: 1
+        min: 1
+  attack_steps:
+    compromised:
+      asset: GPS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: NavigationSystem:compromised
+      name: compromised
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    failure:
+      asset: GPS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: NavigationSystem:failure
+      name: failure
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    gpsJamming:
+      asset: GPS
+      children:
+        INS:coordinatesDrifting:
+        - CommunicatesWith:
+            asset type: INS
+            fieldname: ins
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: gpsJamming
+      overrides: true
+      parents:
+        SystemFailure:hardwareMalfunction:
+        - Disrupts:
+            asset type: SystemFailure
+            fieldname: systemFailure
+          type: field
+      tags: []
+      ttc: null
+      type: or
+    gpsSpoofing:
+      asset: GPS
+      children:
+        INS:adjustmentToFalseCoordinates:
+        - CommunicatesWith:
+            asset type: INS
+            fieldname: ins
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: gpsSpoofing
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    signalEncryption:
+      asset: GPS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: signalEncryption
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: defense
+    spoofedData:
+      asset: GPS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: NavigationSystem:spoofedData
+      name: spoofedData
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: GPS
+  sub_assets: []
+  super_asset: NavigationSystem
+  variables: {}
+HumanError:
+  associations:
+    vessel:
+      info: {}
+      left:
+        asset: HumanError
+        fieldname: humanError
+        max: 1
+        min: 1
+      name: Causes
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+  attack_steps:
+    delayedResponse:
+      asset: HumanError
+      children:
+        Vessel:collisionRisk:
+        - Causes:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: delayedResponse
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    incorrectManualCorrection:
+      asset: HumanError
+      children:
+        Vessel:manualCorrection:
+        - Causes:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: incorrectManualCorrection
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    misinterpretation:
+      asset: HumanError
+      children:
+        Vessel:routeDeviation:
+        - Causes:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: misinterpretation
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: HumanError
+  sub_assets: []
+  super_asset: ''
+  variables: {}
+HumanOperator:
+  associations:
+    vessel:
+      info: {}
+      left:
+        asset: HumanOperator
+        fieldname: humanOperator
+        max: 1
+        min: 1
+      name: Oversees
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+  attack_steps:
+    detectsCyberThreat:
+      asset: HumanOperator
+      children:
+        Vessel:manualCorrection:
+        - Oversees:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: detectsCyberThreat
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    incorrectFleetRouting:
+      asset: HumanOperator
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: MaritimeAsset:incorrectFleetRouting
+      name: incorrectFleetRouting
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    incorrectManualCorrection:
+      asset: HumanOperator
+      children:
+        Vessel:routeDeviation:
+        - Oversees:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: incorrectManualCorrection
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    misinterpretsAIS:
+      asset: HumanOperator
+      children:
+        Vessel:routeDeviation:
+        - Oversees:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: misinterpretsAIS
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    operationalDisruption:
+      asset: HumanOperator
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: MaritimeAsset:operationalDisruption
+      name: operationalDisruption
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    overridesNavigation:
+      asset: HumanOperator
+      children:
+        Vessel:manualCorrection:
+        - Oversees:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: overridesNavigation
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: HumanOperator
+  sub_assets: []
+  super_asset: MaritimeAsset
+  variables: {}
+INS:
+  associations:
+    gps:
+      info: {}
+      left:
+        asset: GPS
+        fieldname: gps
+        max: 1
+        min: 1
+      name: CommunicatesWith
+      right:
+        asset: INS
+        fieldname: ins
+        max: 1
+        min: 1
+    vessel:
+      info: {}
+      left:
+        asset: INS
+        fieldname: ins
+        max: 1
+        min: 1
+      name: Guides
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+  attack_steps:
+    adjustmentToFalseCoordinates:
+      asset: INS
+      children:
+        Vessel:routeDeviation:
+        - Guides:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: adjustmentToFalseCoordinates
+      overrides: true
+      parents:
+        GPS:gpsSpoofing:
+        - CommunicatesWith:
+            asset type: GPS
+            fieldname: gps
+          type: field
+      tags: []
+      ttc: null
+      type: or
+    compromised:
+      asset: INS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: NavigationSystem:compromised
+      name: compromised
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    coordinatesDrifting:
+      asset: INS
+      children:
+        Vessel:routeLoss:
+        - Guides:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: coordinatesDrifting
+      overrides: true
+      parents:
+        GPS:gpsJamming:
+        - CommunicatesWith:
+            asset type: GPS
+            fieldname: gps
+          type: field
+      tags: []
+      ttc: null
+      type: or
+    failure:
+      asset: INS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: NavigationSystem:failure
+      name: failure
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    spoofedData:
+      asset: INS
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: NavigationSystem:spoofedData
+      name: spoofedData
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: INS
+  sub_assets: []
+  super_asset: NavigationSystem
+  variables: {}
+MaritimeAsset:
+  associations: {}
+  attack_steps:
+    incorrectFleetRouting:
+      asset: MaritimeAsset
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: incorrectFleetRouting
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    operationalDisruption:
+      asset: MaritimeAsset
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: operationalDisruption
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: true
+  name: MaritimeAsset
+  sub_assets:
+  - Vessel
+  - HumanOperator
+  - PortInfrastructure
+  super_asset: ''
+  variables: {}
+NavigationSystem:
+  associations: {}
+  attack_steps:
+    compromised:
+      asset: NavigationSystem
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: CyberSystem:compromised
+      name: compromised
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    failure:
+      asset: NavigationSystem
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: failure
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    spoofedData:
+      asset: NavigationSystem
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: spoofedData
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: true
+  name: NavigationSystem
+  sub_assets:
+  - INS
+  - GPS
+  super_asset: CyberSystem
+  variables: {}
+PortInfrastructure:
+  associations:
+    trafficManagement:
+      info: {}
+      left:
+        asset: TrafficManagement
+        fieldname: trafficManagement
+        max: 1
+        min: 1
+      name: ManagedBy
+      right:
+        asset: PortInfrastructure
+        fieldname: portInfrastructure
+        max: 1
+        min: 1
+  attack_steps:
+    incorrectFleetRouting:
+      asset: PortInfrastructure
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: MaritimeAsset:incorrectFleetRouting
+      name: incorrectFleetRouting
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    operationalDisruption:
+      asset: PortInfrastructure
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: MaritimeAsset:operationalDisruption
+      name: operationalDisruption
+      overrides: false
+      parents:
+        TrafficManagement:operationalDisruption:
+        - ManagedBy:
+            asset type: TrafficManagement
+            fieldname: trafficManagement
+          type: field
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: PortInfrastructure
+  sub_assets: []
+  super_asset: MaritimeAsset
+  variables: {}
+SystemFailure:
+  associations:
+    ais:
+      info: {}
+      left:
+        asset: SystemFailure
+        fieldname: systemFailure
+        max: 1
+        min: 1
+      name: Affects
+      right:
+        asset: AIS
+        fieldname: ais
+        max: 1
+        min: 1
+    gps:
+      info: {}
+      left:
+        asset: SystemFailure
+        fieldname: systemFailure
+        max: 1
+        min: 1
+      name: Disrupts
+      right:
+        asset: GPS
+        fieldname: gps
+        max: 1
+        min: 1
+  attack_steps:
+    hardwareMalfunction:
+      asset: SystemFailure
+      children:
+        GPS:gpsJamming:
+        - Disrupts:
+            asset type: GPS
+            fieldname: gps
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: hardwareMalfunction
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    softwareBug:
+      asset: SystemFailure
+      children:
+        AIS:aisDataManipulation:
+        - Affects:
+            asset type: AIS
+            fieldname: ais
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: softwareBug
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: SystemFailure
+  sub_assets: []
+  super_asset: ''
+  variables: {}
+TrafficManagement:
+  associations:
+    ais:
+      info: {}
+      left:
+        asset: AIS
+        fieldname: ais
+        max: 1
+        min: 1
+      name: CommunicatesWith
+      right:
+        asset: TrafficManagement
+        fieldname: trafficManagement
+        max: 1
+        min: 1
+    portInfrastructure:
+      info: {}
+      left:
+        asset: TrafficManagement
+        fieldname: trafficManagement
+        max: 1
+        min: 1
+      name: ManagedBy
+      right:
+        asset: PortInfrastructure
+        fieldname: portInfrastructure
+        max: 1
+        min: 1
+    vessel:
+      info: {}
+      left:
+        asset: TrafficManagement
+        fieldname: trafficManagement
+        max: 1
+        min: 1
+      name: Manages
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+  attack_steps:
+    compromised:
+      asset: TrafficManagement
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: CommunicationSystem:compromised
+      name: compromised
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    dataManipulation:
+      asset: TrafficManagement
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: CommunicationSystem:dataManipulation
+      name: dataManipulation
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    falseVesselTracking:
+      asset: TrafficManagement
+      children:
+        TrafficManagement:incorrectFleetRouting:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: falseVesselTracking
+      overrides: true
+      parents:
+        AIS:falseAISDataToTrafficManagement:
+        - CommunicatesWith:
+            asset type: AIS
+            fieldname: ais
+          type: field
+      tags: []
+      ttc: null
+      type: or
+    incorrectFleetRouting:
+      asset: TrafficManagement
+      children:
+        Vessel:routeDeviation:
+        - Manages:
+            asset type: Vessel
+            fieldname: vessel
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: incorrectFleetRouting
+      overrides: true
+      parents:
+        AIS:falseAISDataToTrafficManagement:
+        - CommunicatesWith:
+            asset type: AIS
+            fieldname: ais
+          type: field
+        TrafficManagement:falseVesselTracking:
+        - null
+      tags: []
+      ttc: null
+      type: or
+    operationalDisruption:
+      asset: TrafficManagement
+      children:
+        PortInfrastructure:operationalDisruption:
+        - ManagedBy:
+            asset type: PortInfrastructure
+            fieldname: portInfrastructure
+          type: field
+      detectors: {}
+      info: {}
+      inherits: null
+      name: operationalDisruption
+      overrides: true
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: TrafficManagement
+  sub_assets: []
+  super_asset: CommunicationSystem
+  variables: {}
+Vessel:
+  associations:
+    ais:
+      info: {}
+      left:
+        asset: AIS
+        fieldname: ais
+        max: 1
+        min: 1
+      name: SendsDataTo
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+    humanError:
+      info: {}
+      left:
+        asset: HumanError
+        fieldname: humanError
+        max: 1
+        min: 1
+      name: Causes
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+    humanOperator:
+      info: {}
+      left:
+        asset: HumanOperator
+        fieldname: humanOperator
+        max: 1
+        min: 1
+      name: Oversees
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+    ins:
+      info: {}
+      left:
+        asset: INS
+        fieldname: ins
+        max: 1
+        min: 1
+      name: Guides
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+    trafficManagement:
+      info: {}
+      left:
+        asset: TrafficManagement
+        fieldname: trafficManagement
+        max: 1
+        min: 1
+      name: Manages
+      right:
+        asset: Vessel
+        fieldname: vessel
+        max: 1
+        min: 1
+  attack_steps:
+    collisionRisk:
+      asset: Vessel
+      children:
+        Vessel:manualCorrection:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: collisionRisk
+      overrides: true
+      parents:
+        AIS:falseAISDataToVessel:
+        - SendsDataTo:
+            asset type: AIS
+            fieldname: ais
+          type: field
+        HumanError:delayedResponse:
+        - Causes:
+            asset type: HumanError
+            fieldname: humanError
+          type: field
+        Vessel:falsePosition:
+        - null
+        Vessel:receivedFalseAIS:
+        - null
+        Vessel:routeDeviation:
+        - null
+      tags: []
+      ttc: null
+      type: or
+    falsePosition:
+      asset: Vessel
+      children:
+        Vessel:collisionRisk:
+        - null
+        Vessel:operationalDisruption:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: falsePosition
+      overrides: true
+      parents:
+        AIS:falseAISData:
+        - SendsDataTo:
+            asset type: AIS
+            fieldname: ais
+          type: field
+        Vessel:receivedFalseAIS:
+        - null
+      tags: []
+      ttc: null
+      type: or
+    incorrectFleetRouting:
+      asset: Vessel
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: MaritimeAsset:incorrectFleetRouting
+      name: incorrectFleetRouting
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+    manualCorrection:
+      asset: Vessel
+      children:
+        Vessel:routeDeviation:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: manualCorrection
+      overrides: true
+      parents:
+        HumanError:incorrectManualCorrection:
+        - Causes:
+            asset type: HumanError
+            fieldname: humanError
+          type: field
+        HumanOperator:detectsCyberThreat:
+        - Oversees:
+            asset type: HumanOperator
+            fieldname: humanOperator
+          type: field
+        HumanOperator:overridesNavigation:
+        - Oversees:
+            asset type: HumanOperator
+            fieldname: humanOperator
+          type: field
+        Vessel:collisionRisk:
+        - null
+      tags: []
+      ttc: null
+      type: or
+    operationalDisruption:
+      asset: Vessel
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: MaritimeAsset:operationalDisruption
+      name: operationalDisruption
+      overrides: false
+      parents:
+        Vessel:falsePosition:
+        - null
+      tags: []
+      ttc: null
+      type: or
+    receivedFalseAIS:
+      asset: Vessel
+      children:
+        Vessel:collisionRisk:
+        - null
+        Vessel:falsePosition:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: receivedFalseAIS
+      overrides: true
+      parents:
+        AIS:falseAISDataToVessel:
+        - SendsDataTo:
+            asset type: AIS
+            fieldname: ais
+          type: field
+      tags: []
+      ttc: null
+      type: or
+    routeDeviation:
+      asset: Vessel
+      children:
+        Vessel:collisionRisk:
+        - null
+      detectors: {}
+      info: {}
+      inherits: null
+      name: routeDeviation
+      overrides: true
+      parents:
+        HumanError:misinterpretation:
+        - Causes:
+            asset type: HumanError
+            fieldname: humanError
+          type: field
+        HumanOperator:incorrectManualCorrection:
+        - Oversees:
+            asset type: HumanOperator
+            fieldname: humanOperator
+          type: field
+        HumanOperator:misinterpretsAIS:
+        - Oversees:
+            asset type: HumanOperator
+            fieldname: humanOperator
+          type: field
+        INS:adjustmentToFalseCoordinates:
+        - Guides:
+            asset type: INS
+            fieldname: ins
+          type: field
+        TrafficManagement:incorrectFleetRouting:
+        - Manages:
+            asset type: TrafficManagement
+            fieldname: trafficManagement
+          type: field
+        Vessel:manualCorrection:
+        - null
+      tags: []
+      ttc: null
+      type: or
+    routeLoss:
+      asset: Vessel
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: routeLoss
+      overrides: false
+      parents:
+        INS:coordinatesDrifting:
+        - Guides:
+            asset type: INS
+            fieldname: ins
+          type: field
+      tags: []
+      ttc: null
+      type: or
+    unexpectedWaitingTime:
+      asset: Vessel
+      children: {}
+      detectors: {}
+      info: {}
+      inherits: null
+      name: unexpectedWaitingTime
+      overrides: false
+      parents: {}
+      tags: []
+      ttc: null
+      type: or
+  info: {}
+  is_abstract: false
+  name: Vessel
+  sub_assets: []
+  super_asset: MaritimeAsset
+  variables: {}
+metadata:
+  id: org.mal-lang.harborLang
+  version: 1.0.0
